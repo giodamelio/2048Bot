@@ -20,6 +20,13 @@ var move = function(direction) {
     document.dispatchEvent(event);
 }
 
+var randomIntFromInterval = function randomIntFromInterval(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 $(".automate-button").click(function() {
-    move("right");
+    var directions = ["right", "down", "up", "left"];
+    setInterval(function() {
+        move(directions[randomIntFromInterval(0, 3)]);
+    }, 500);
 });
