@@ -38,6 +38,9 @@ GM_addStyle("""
     .game-container {
         margin-top: 20px;
     }
+    .hidden {
+        display: none;
+    }
 """)
 # Add our html
 $(".above-game").after("""
@@ -45,37 +48,61 @@ $(".above-game").after("""
         <a class="restart-button automate-button">Auto Solve</a>
         <p class="game-intro tick-display">Tick 0</p>
     </div>
+    <div id="dialog" class="hidden" title="2048 Bot">
+        <label for="algorithmPicker">Algorithm</label>
+        <select id="algorithmPicker" name="algorithmPicker">
+            <option value="random" selected>Random</option>
+            <option value="other">Other</option>
+        </select>
+        <br>
+        <br>
+        <label for="speed">Speed (ms)</label>
+        <input type="number" name="speed" id="speed" value="100" step="100">
+    </div>
 """)
 
-move = (direction) ->
-    event = new CustomEvent("doMove",
-        detail:
-            direction: direction
-    )
-    document.dispatchEvent event
-
-randomIntFromInterval = (min, max) ->
-    Math.floor Math.random() * (max - min + 1) + min
-
-tickId = `undefined`
-tick = 0
+# Handle our button
 $(".automate-button").click ->
-    tick = 0
-    $(".tick-display").text "Tick " + tick
-    directions = [
-        "right"
-        "down"
-        "up"
-        "left"
-    ]
-    tickId = setInterval(->
-        # Move the tiles
-        move directions[randomIntFromInterval(0, 3)]
-        
-        # Update the tick
-        tick = tick + 1
-        $(".tick-display").text "Tick " + tick
-    , 100)
+    $("#dialog").dialog(
+        width: 600
+        modal: true
+        buttons:
+            "Go": ->
+                $(this).dialog("close")
+                switch $("#algorithmPicker").val()
+                    when "random"
+                        new RandomAlgorithm $("#speed").val()
+    )
 
-document.addEventListener "gameOver", (event) ->
-    clearInterval tickId
+# Tha base class all the algorithms extend
+class Algorithm
+    constructor: (@speed) ->
+        @tickId = setInterval(@tick, @speed)
+        @tickCount = 0
+
+        # Stop the algorithm when the game is over
+        document.addEventListener "gameOver", (event) =>
+            clearInterval(@tickId)
+
+    tick: ->
+        @tickCount = @tickCount + 1
+        $(".tick-display").text("Tick " + @tickCount)
+
+    move: (direction) ->
+        @sendEvent("doMove", { "direction": direction })
+
+    sendEvent: (name, data) ->
+        event = new CustomEvent(name, { detail: data })
+        document.dispatchEvent event
+
+    randomInt: (min, max) ->
+        return Math.floor(Math.random() * (max - min + 1) + min)
+
+# Just move around randomly
+class RandomAlgorithm extends Algorithm
+    tick: =>
+        super()
+        directions = ["right", "down", "up", "left"]
+        # event = new CustomEvent("doMove", { detail: { "direction": directions[@randomInt(0, 3)] } })
+        # document.dispatchEvent event
+        @move(directions[@randomInt(0, 3)])
