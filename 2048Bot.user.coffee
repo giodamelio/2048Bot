@@ -60,6 +60,7 @@ $(".above-game").after("""
         <label for="algorithmPicker">Algorithm</label>
         <select id="algorithmPicker" name="algorithmPicker">
             <option value="random" selected>Random</option>
+            <option value="circle">Circle (clockwise)</option>
         </select>
         <br>
         <br>
@@ -79,6 +80,8 @@ $(".automate-button").click ->
                 switch $("#algorithmPicker").val()
                     when "random"
                         new RandomAlgorithm $("#speed").val()
+                    when "circle"
+                        new CircleAlgorithm $("#speed").val()
     )
 
 # Tha base class all the algorithms extend
@@ -110,6 +113,15 @@ class RandomAlgorithm extends Algorithm
     tick: =>
         super()
         directions = ["right", "down", "up", "left"]
-        # event = new CustomEvent("doMove", { detail: { "direction": directions[@randomInt(0, 3)] } })
-        # document.dispatchEvent event
         @move(directions[@randomInt(0, 3)])
+
+# Go in a circle clockwise
+class CircleAlgorithm extends Algorithm
+    tick: =>
+        super()
+        directions = ["right", "down", "left", "up"]
+        if @next?
+            @move(@next)
+            @next = directions[(directions.indexOf(@next) + 1) % 4]
+        else
+            @next = "right"
