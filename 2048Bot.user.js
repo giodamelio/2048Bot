@@ -20,7 +20,7 @@ $(".tick-display").css("margin-top", "5px");
 $(".game-container").css("margin-top", "20px");
 
 var move = function(direction) {
-    var event = new CustomEvent("move", { "detail": { "direction": direction} })
+    var event = new CustomEvent("doMove", { "detail": { "direction": direction} })
     document.dispatchEvent(event);
 }
 
@@ -28,15 +28,20 @@ var randomIntFromInterval = function randomIntFromInterval(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+var tickId = undefined;
 $(".automate-button").click(function() {
     var tick = 1;
     var directions = ["right", "down", "up", "left"];
-    setInterval(function() {
+    tickId = setInterval(function() {
         // Move the tiles
         move(directions[randomIntFromInterval(0, 3)]);
 
         // Update the tick
         $(".tick-display").text("Tick " + tick);
         tick = tick + 1;
-    }, 500);
+    }, 100);
+});
+
+document.addEventListener("gameOver", function (event) {
+    clearInterval(tickId);
 });
