@@ -5,11 +5,22 @@
 // @description     Too lazy to get your own 2048, let this bot take care of it for you.
 // @copyright       2012+, Gio d'Amelio
 //
-// @grant           none
+// Load on the live version as well as the dev version
 // @match           http://gabrielecirulli.github.io/2048/
 // @match           http://localhost:3141/
+//
+// Get jquery and jquery UI
 // @require         http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
+// @require         http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js
+// @resource        jQueryUICSS http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css
+//
+// Give permission to load the css
+// @grant           GM_getResourceText
+// @grant           GM_addStyle
 // ==/UserScript==
+
+// Add jquery ui to the page
+GM_addStyle(GM_getResourceText("jQueryUICSS"));
 
 // Add our button
 $(".above-game").after("<div class=\"above-game\"><a class=\"restart-button automate-button\">Auto Solve</a><p class=\"game-intro tick-display\">Tick 0</p></div>");
@@ -29,16 +40,18 @@ var randomIntFromInterval = function randomIntFromInterval(min, max) {
 }
 
 var tickId = undefined;
+var tick = 0;
 $(".automate-button").click(function() {
-    var tick = 1;
+    tick = 0;
+    $(".tick-display").text("Tick " + tick);
     var directions = ["right", "down", "up", "left"];
     tickId = setInterval(function() {
         // Move the tiles
         move(directions[randomIntFromInterval(0, 3)]);
 
         // Update the tick
-        $(".tick-display").text("Tick " + tick);
         tick = tick + 1;
+        $(".tick-display").text("Tick " + tick);
     }, 100);
 });
 
