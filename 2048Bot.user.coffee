@@ -41,6 +41,14 @@ GM_addStyle("""
     .hidden {
         display: none;
     }
+    .ui-dialog, .ui-dialog-content, .ui-dialog-buttonpane, .ui-dialog-titlebar-close {
+        background-color: #FAF8EF;
+        color: #776E65;
+    }
+    .ui-dialog-titlebar {
+        background-color: #8F7A66;
+        color: #F9F6F2;
+    }
 """)
 # Add our html
 $(".above-game").after("""
@@ -52,7 +60,6 @@ $(".above-game").after("""
         <label for="algorithmPicker">Algorithm</label>
         <select id="algorithmPicker" name="algorithmPicker">
             <option value="random" selected>Random</option>
-            <option value="other">Other</option>
         </select>
         <br>
         <br>
